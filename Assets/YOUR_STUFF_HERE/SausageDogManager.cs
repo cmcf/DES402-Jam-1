@@ -6,6 +6,21 @@ public class SausageDogManager : MinigameBase
 {
     [SerializeField] PlayerDog[] playerDogs;
 
+    void Awake()
+    {
+        MinigameLoaded.AddListener(InitialiseGame);
+    }
+
+    /// <summary>
+    /// How do you want to handle input from the four directional buttons?
+    /// </summary>
+    /// <param name="playerIndex">Which player (0-3) pressed the button</param>
+    /// <param name="direction">Which direction(s) are they pressing</param>
+    public override void OnDirectionalInput(int playerIndex, Vector2 direction)
+    {
+        playerDogs[playerIndex].HandleDirectionalInput(direction);
+    }
+
     public void InitialiseGame()
     {
         Debug.Log("Initialising dog mini game");
@@ -18,10 +33,6 @@ public class SausageDogManager : MinigameBase
         }
     }
 
-    private void Awake()
-    {
-        MinigameLoaded.AddListener(InitialiseGame);
-    }
 
     /// <summary>
     /// This function is called at the end of the game so that it knows what to display on the score screen.
@@ -47,15 +58,7 @@ public class SausageDogManager : MinigameBase
         return gsd;
     }
 
-    /// <summary>
-    /// How do you want to handle input from the four directional buttons?
-    /// </summary>
-    /// <param name="playerIndex">Which player (0-3) pressed the button</param>
-    /// <param name="direction">Which direction(s) are they pressing</param>
-    public override void OnDirectionalInput(int playerIndex, Vector2 direction)
-    {
-        playerDogs[playerIndex].HandleDirectionalInput(direction);
-    }
+  
     /// <summary>
     /// What should happen when the player presses the left hand button?
     /// </summary>
