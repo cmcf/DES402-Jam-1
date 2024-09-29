@@ -19,6 +19,7 @@ TagManager:
   - MissedTrigger
   - MinigameManager
   - Food
+  - Obstacle
   layers:
   - Default
   - TransparentFX

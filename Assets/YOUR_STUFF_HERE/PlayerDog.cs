@@ -43,7 +43,7 @@ public class PlayerDog : MonoBehaviour
         return position;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    void OnTriggerEnter2D(Collider2D collision)
     {
         // Players scale is increased if they collide with food
         if (collision.CompareTag("Food"))
@@ -51,6 +51,15 @@ public class PlayerDog : MonoBehaviour
             Debug.Log("Eaten");
             Vector3 newScale = transform.localScale;
             newScale.y += 1;
+            transform.localScale = newScale;
+        }
+
+        // Players scale is decreased if they collide with obstacles
+        if (collision.CompareTag("Obstacle"))
+        {
+            Debug.Log("Eaten");
+            Vector3 newScale = transform.localScale;
+            newScale.y -= 1;
             transform.localScale = newScale;
         }
     }
