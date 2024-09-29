@@ -42,4 +42,16 @@ public class PlayerDog : MonoBehaviour
         // Return the y clamped position
         return position;
     }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        // Players scale is increased if they collide with food
+        if (collision.CompareTag("Food"))
+        {
+            Debug.Log("Eaten");
+            Vector3 newScale = transform.localScale;
+            newScale.y += 1;
+            transform.localScale = newScale;
+        }
+    }
 }

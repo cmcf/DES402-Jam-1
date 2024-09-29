@@ -163,7 +163,7 @@ PlayerSettings:
   androidMaxAspectRatio: 2.1
   androidMinAspectRatio: 1
   applicationIdentifier:
-    Standalone: com.AbertayUniversity.WhalesongPark
+    Standalone: com.Abertay-University.WhalesongPark
   buildNumber:
     Bratwurst: 0
     Standalone: 0
