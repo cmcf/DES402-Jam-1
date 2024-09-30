@@ -9,8 +9,15 @@ public class PlayerDog : MonoBehaviour
     public int screenID = -1;
     Vector2 inputDirection = Vector2.zero;
 
+    SpriteRenderer spriteRenderer;
+
     float yPadding = 0.1f;
     float xPadding = 0.5f;
+
+    void Start()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+    }
 
     void Update()
     {
@@ -18,6 +25,40 @@ public class PlayerDog : MonoBehaviour
         Vector2 moveDirection = inputDirection;
         transform.position += (Vector3)moveDirection * dogMoveSpeed * Time.deltaTime;
 
+        // Rotate the player based on the direction
+        transform.eulerAngles = new Vector3(0, 0, GetAngleFromVector(moveDirection));
+
+        ClampScreen();
+    }
+
+    float GetAngleFromVector(Vector2 dir)
+    {
+        // Default rotation angle is 0 when player is facing up
+        float angle = 0;
+
+        // Determine the angle based on direction
+        if (dir.x > 0) // Moving right
+        {
+            angle = -90;  // Rotate -90 degrees for right
+        }
+        else if (dir.x < 0) // Moving left
+        {
+            angle = 90;  // Rotate 90 degrees for left
+        }
+        else if (dir.y < 0) // Moving down
+        {
+            angle = 180;  // Rotate 180 degrees for down
+        }
+        else if (dir.y > 0) // Moving up
+        {
+            angle = 0;  // Keep 0 degrees for up
+        }
+
+        return angle;
+    }
+
+    private void ClampScreen()
+    {
         // Clamps the x-position
         Vector3 clampedXPosition = ScreenUtility.ClampToScreen(transform.position, screenID, xPadding);
 
@@ -52,15 +93,22 @@ public class PlayerDog : MonoBehaviour
             Vector3 newScale = transform.localScale;
             newScale.y += 1;
             transform.localScale = newScale;
+
+            Destroy(collision.gameObject);
         }
 
-        // Players scale is decreased if they collide with obstacles
+        // Player's scale is decreased if they collide with obstacles
         if (collision.CompareTag("Obstacle"))
         {
             Debug.Log("Eaten");
             Vector3 newScale = transform.localScale;
-            newScale.y -= 1;
+
+            // Decrease the y scale, but ensure it doesn't go below 1
+            newScale.y = Mathf.Max(newScale.y - 1, 1f);
+
             transform.localScale = newScale;
+
+            Destroy(collision.gameObject);
         }
     }
 }
