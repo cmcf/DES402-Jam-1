@@ -6,6 +6,7 @@ using UnityEngine.UIElements;
 public class PlayerDog : MonoBehaviour
 {
     [SerializeField] float dogMoveSpeed = 2f;
+    [SerializeField] float sizeChangeAmount = 0.5f;
     public int screenID = -1;
     Vector2 inputDirection = Vector2.zero;
 
@@ -78,7 +79,7 @@ public class PlayerDog : MonoBehaviour
     public static Vector3 ClampToScreen(Vector3 position, int screenID, float yPadding)
     {
         // Clamp the y-position to the fixed screen range
-        position.y = Mathf.Clamp(position.y, -7.5f, 7f);
+        position.y = Mathf.Clamp(position.y, -4.5f, 4.5f);
 
         // Return the y clamped position
         return position;
@@ -89,9 +90,8 @@ public class PlayerDog : MonoBehaviour
         // Players scale is increased if they collide with food
         if (collision.CompareTag("Food"))
         {
-            Debug.Log("Eaten");
             Vector3 newScale = transform.localScale;
-            newScale.y += 1;
+            newScale.y += sizeChangeAmount;
             transform.localScale = newScale;
 
             Destroy(collision.gameObject);
@@ -100,11 +100,10 @@ public class PlayerDog : MonoBehaviour
         // Player's scale is decreased if they collide with obstacles
         if (collision.CompareTag("Obstacle"))
         {
-            Debug.Log("Eaten");
             Vector3 newScale = transform.localScale;
 
             // Decrease the y scale, but ensure it doesn't go below 1
-            newScale.y = Mathf.Max(newScale.y - 1, 1f);
+            newScale.y = Mathf.Max(newScale.y - sizeChangeAmount, 1f);
 
             transform.localScale = newScale;
 
