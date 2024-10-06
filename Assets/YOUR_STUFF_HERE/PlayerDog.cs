@@ -10,6 +10,8 @@ public class PlayerDog : MonoBehaviour
     public int screenID = -1;
     Vector2 inputDirection = Vector2.zero;
 
+    public int playerScore = 0;
+
     SpriteRenderer spriteRenderer;
 
     float yPadding = 0.1f;
@@ -93,6 +95,10 @@ public class PlayerDog : MonoBehaviour
             Vector3 newScale = transform.localScale;
             newScale.y += sizeChangeAmount;
             transform.localScale = newScale;
+
+            // Increase the player's score when food is collected
+            playerScore += 1;
+            Debug.Log("Player Score: " + playerScore);
 
             Destroy(collision.gameObject);
         }
