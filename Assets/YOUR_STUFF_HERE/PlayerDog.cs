@@ -14,6 +14,8 @@ public class PlayerDog : MonoBehaviour
 
     SpriteRenderer spriteRenderer;
 
+    Vector2 lastMoveDirection;
+
     float yPadding = 0.1f;
     float xPadding = 0.5f;
 
@@ -22,18 +24,23 @@ public class PlayerDog : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
+  
+
     void Update()
     {
         // Player moves at a consistent speed
         Vector2 moveDirection = inputDirection;
         transform.position += (Vector3)moveDirection * dogMoveSpeed * Time.deltaTime;
 
-        // Rotate the player based on the direction
-        transform.eulerAngles = new Vector3(0, 0, GetAngleFromVector(moveDirection));
+        // Rotate the player only if the move direction has changed
+        if (moveDirection != Vector2.zero && moveDirection != lastMoveDirection)
+        {
+            transform.eulerAngles = new Vector3(0, 0, GetAngleFromVector(moveDirection));
+            lastMoveDirection = moveDirection; // Update last move direction
+        }
 
         ClampScreen();
     }
-
     float GetAngleFromVector(Vector2 dir)
     {
         // Default rotation angle is 0 when player is facing up
