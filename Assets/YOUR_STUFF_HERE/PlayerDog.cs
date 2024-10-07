@@ -6,13 +6,19 @@ using UnityEngine.UIElements;
 public class PlayerDog : MonoBehaviour
 {
     [SerializeField] float dogMoveSpeed = 2f;
-    [SerializeField] float sizeChangeAmount = 0.5f;
+    [SerializeField] float dogSizeAmount = 0.2f;
+
+    [SerializeField] float timerIncreaseAmount = 0.5f;
+    [SerializeField] float timerDecreaseAmount = 0.5f;
     public int screenID = -1;
     Vector2 inputDirection = Vector2.zero;
 
     public int playerScore = 0;
 
     SpriteRenderer spriteRenderer;
+    GameTimer gameTimer;
+
+    MinigameManager minigameManager;
 
     Vector2 lastMoveDirection;
 
@@ -22,6 +28,7 @@ public class PlayerDog : MonoBehaviour
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        minigameManager = FindObjectOfType<MinigameManager>();
     }
 
     void Update()
@@ -98,15 +105,18 @@ public class PlayerDog : MonoBehaviour
         if (collision.CompareTag("Food"))
         {
             Vector3 newScale = transform.localScale;
-            newScale.y += sizeChangeAmount;
+            newScale.y += dogSizeAmount;
             transform.localScale = newScale;
 
             // Increase the player's score when food is collected
             playerScore += 1;
             Debug.Log("Player Score: " + playerScore);
 
-            // Timer is increased by 0.5 seconds when food is collected
-            GetComponent<GameManager>().IncreaseTimer(0.5f);
+            if (minigameManager!= null)
+            {
+                // Timer is increased by the increase amount when food is collected
+                minigameManager.GetTimer().AddTime(timerIncreaseAmount);
+            }
 
             Destroy(collision.gameObject);
         }
@@ -117,7 +127,13 @@ public class PlayerDog : MonoBehaviour
             Vector3 newScale = transform.localScale;
 
             // Decrease the y scale, but ensure it doesn't go below 1
-            newScale.y = Mathf.Max(newScale.y - sizeChangeAmount, 1f);
+            newScale.y = Mathf.Max(newScale.y - dogSizeAmount, 1f);
+
+            if (minigameManager != null)
+            {
+                // Decrease game timer
+                minigameManager.GetTimer().AddTime(-timerDecreaseAmount);
+            }
 
             transform.localScale = newScale;
 

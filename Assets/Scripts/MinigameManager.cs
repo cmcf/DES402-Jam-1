@@ -96,6 +96,11 @@ public class MinigameManager : MonoBehaviour
         MinigamesCompleted++;
     }
 
+    public GameTimer GetTimer()
+    {
+        return m_Timer;
+    }
+
     //Properties
     public string CurrentGameName
     {
