@@ -24,8 +24,6 @@ public class PlayerDog : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-  
-
     void Update()
     {
         // Player moves at a consistent speed
@@ -106,6 +104,9 @@ public class PlayerDog : MonoBehaviour
             // Increase the player's score when food is collected
             playerScore += 1;
             Debug.Log("Player Score: " + playerScore);
+
+            // Timer is increased by 0.5 seconds when food is collected
+            GetComponent<GameManager>().IncreaseTimer(0.5f);
 
             Destroy(collision.gameObject);
         }
