@@ -5,6 +5,13 @@ using UnityEngine.UIElements;
 
 public class PlayerDog : MonoBehaviour
 {
+    public GameObject foodSegmentPrefab; // Prefab of the food segment to spawn
+    public List<Transform> segments = new List<Transform>(); // List of all player food segments
+
+    private List<Vector3> positions = new List<Vector3>(); // Positions for food segments to follow
+
+    public float segmentSpacing = 0.5f; // Distance between each food segment
+
     [SerializeField] float dogMoveSpeed = 2f;
     [SerializeField] float dogSizeAmount = 0.2f;
 
@@ -27,6 +34,9 @@ public class PlayerDog : MonoBehaviour
 
     void Start()
     {
+        // Add the initial player object to the list of segments
+        segments.Add(transform);
+
         spriteRenderer = GetComponent<SpriteRenderer>();
         minigameManager = FindObjectOfType<MinigameManager>();
     }
@@ -44,8 +54,28 @@ public class PlayerDog : MonoBehaviour
             lastMoveDirection = moveDirection; // Update last move direction
         }
 
+        // Add the player's current position to the list of positions at the start of each frame
+        positions.Insert(0, transform.position);
+
+        // Ensure the number of stored positions matches the number of segments
+        if (positions.Count > segments.Count)
+        {
+            positions.RemoveAt(positions.Count - 1);
+        }
+
+        // Iterate through each segment starting from the second one
+        for (int i = 1; i < segments.Count; i++)
+        {
+            // Get the previous segment (segment ahead of this one)
+            Transform previousSegment = segments[i - 1];
+
+            // Move the current segment towards the position of the segment ahead, but keep the offset
+            segments[i].position = Vector3.Lerp(segments[i].position, previousSegment.position - previousSegment.up * segmentSpacing, Time.deltaTime * 10);
+        }
+
         ClampScreen();
     }
+
     float GetAngleFromVector(Vector2 dir)
     {
         // Default rotation angle is 0 when player is facing up
@@ -99,14 +129,32 @@ public class PlayerDog : MonoBehaviour
         return position;
     }
 
+    void AddSegment()
+    {
+        // Get the last segment in the list
+        Transform lastSegment = segments[segments.Count - 1];
+
+        // Calculate the position for the new segment behind the last segment
+        Vector3 newSegmentPosition = lastSegment.position - lastSegment.up * segmentSpacing;
+
+        // Instantiate a new segment at the calculated position
+        GameObject newSegment = Instantiate(foodSegmentPrefab, newSegmentPosition, Quaternion.identity);
+
+        // Add the new segment to the list
+        segments.Add(newSegment.transform);
+    }
+
     void OnTriggerEnter2D(Collider2D collision)
     {
         // Players scale is increased if they collide with food
         if (collision.CompareTag("Food"))
         {
-            Vector3 newScale = transform.localScale;
-            newScale.y += dogSizeAmount;
-            transform.localScale = newScale;
+            //Vector3 newScale = transform.localScale;
+            //newScale.y += dogSizeAmount;
+            //transform.localScale = newScale;
+
+            // Spawn a new segment and place it behind the last one
+            AddSegment();
 
             // Increase the player's score when food is collected
             playerScore += 1;
