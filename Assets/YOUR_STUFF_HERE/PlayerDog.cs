@@ -47,11 +47,12 @@ public class PlayerDog : MonoBehaviour
         Vector2 moveDirection = inputDirection;
         transform.position += (Vector3)moveDirection * dogMoveSpeed * Time.deltaTime;
 
-        // Rotate the player only if the move direction has changed
+        // Rotates the player only if the move direction has changed
         if (moveDirection != Vector2.zero && moveDirection != lastMoveDirection)
         {
             transform.eulerAngles = new Vector3(0, 0, GetAngleFromVector(moveDirection));
-            lastMoveDirection = moveDirection; // Update last move direction
+            // Updates last move direction
+            lastMoveDirection = moveDirection; 
         }
 
         // Add the player's current position to the list of positions at the start of each frame
@@ -63,14 +64,16 @@ public class PlayerDog : MonoBehaviour
             positions.RemoveAt(positions.Count - 1);
         }
 
-        // Iterate through each segment starting from the second one
+        // Move each segment to the position behind the previous segment with smooth following
         for (int i = 1; i < segments.Count; i++)
         {
-            // Get the previous segment (segment ahead of this one)
             Transform previousSegment = segments[i - 1];
 
-            // Move the current segment towards the position of the segment ahead, but keep the offset
-            segments[i].position = Vector3.Lerp(segments[i].position, previousSegment.position - previousSegment.up * segmentSpacing, Time.deltaTime * 10);
+            // Calculate the target position for the current segment based on the previous segment's position
+            Vector3 targetPosition = previousSegment.position - previousSegment.up * segmentSpacing;
+
+            // Gradually move the current segment towards the target position using Lerp for smooth movement
+            segments[i].position = Vector3.Lerp(segments[i].position, targetPosition, Time.deltaTime * dogMoveSpeed);
         }
 
         ClampScreen();
@@ -134,7 +137,7 @@ public class PlayerDog : MonoBehaviour
         // Get the last segment in the list
         Transform lastSegment = segments[segments.Count - 1];
 
-        // Calculate the position for the new segment behind the last segment
+        // Calculates the position for the new segment behind the last segment
         Vector3 newSegmentPosition = lastSegment.position - lastSegment.up * segmentSpacing;
 
         // Instantiate a new segment at the calculated position
@@ -149,11 +152,12 @@ public class PlayerDog : MonoBehaviour
         // Players scale is increased if they collide with food
         if (collision.CompareTag("Food"))
         {
+            //OLD CODE
             //Vector3 newScale = transform.localScale;
             //newScale.y += dogSizeAmount;
             //transform.localScale = newScale;
 
-            // Spawn a new segment and place it behind the last one
+            // Spawn a new food segment and place it behind the last one
             AddSegment();
 
             // Increase the player's score when food is collected
