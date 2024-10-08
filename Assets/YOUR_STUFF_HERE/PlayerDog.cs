@@ -6,11 +6,21 @@ using UnityEngine.UIElements;
 public class PlayerDog : MonoBehaviour
 {
     [SerializeField] float dogMoveSpeed = 2f;
-    [SerializeField] float sizeChangeAmount = 0.5f;
+    [SerializeField] float dogSizeAmount = 0.2f;
+
+    [SerializeField] float timerIncreaseAmount = 0.5f;
+    [SerializeField] float timerDecreaseAmount = 0.5f;
     public int screenID = -1;
     Vector2 inputDirection = Vector2.zero;
 
+    public int playerScore = 0;
+
     SpriteRenderer spriteRenderer;
+    GameTimer gameTimer;
+
+    MinigameManager minigameManager;
+
+    Vector2 lastMoveDirection;
 
     float yPadding = 0.1f;
     float xPadding = 0.5f;
@@ -18,6 +28,7 @@ public class PlayerDog : MonoBehaviour
     void Start()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+        minigameManager = FindObjectOfType<MinigameManager>();
     }
 
     void Update()
@@ -26,12 +37,15 @@ public class PlayerDog : MonoBehaviour
         Vector2 moveDirection = inputDirection;
         transform.position += (Vector3)moveDirection * dogMoveSpeed * Time.deltaTime;
 
-        // Rotate the player based on the direction
-        transform.eulerAngles = new Vector3(0, 0, GetAngleFromVector(moveDirection));
+        // Rotate the player only if the move direction has changed
+        if (moveDirection != Vector2.zero && moveDirection != lastMoveDirection)
+        {
+            transform.eulerAngles = new Vector3(0, 0, GetAngleFromVector(moveDirection));
+            lastMoveDirection = moveDirection; // Update last move direction
+        }
 
         ClampScreen();
     }
-
     float GetAngleFromVector(Vector2 dir)
     {
         // Default rotation angle is 0 when player is facing up
@@ -91,8 +105,18 @@ public class PlayerDog : MonoBehaviour
         if (collision.CompareTag("Food"))
         {
             Vector3 newScale = transform.localScale;
-            newScale.y += sizeChangeAmount;
+            newScale.y += dogSizeAmount;
             transform.localScale = newScale;
+
+            // Increase the player's score when food is collected
+            playerScore += 1;
+            Debug.Log("Player Score: " + playerScore);
+
+            if (minigameManager!= null)
+            {
+                // Timer is increased by the increase amount when food is collected
+                minigameManager.GetTimer().AddTime(timerIncreaseAmount);
+            }
 
             Destroy(collision.gameObject);
         }
@@ -103,7 +127,13 @@ public class PlayerDog : MonoBehaviour
             Vector3 newScale = transform.localScale;
 
             // Decrease the y scale, but ensure it doesn't go below 1
-            newScale.y = Mathf.Max(newScale.y - sizeChangeAmount, 1f);
+            newScale.y = Mathf.Max(newScale.y - dogSizeAmount, 1f);
+
+            if (minigameManager != null)
+            {
+                // Decrease game timer
+                minigameManager.GetTimer().AddTime(-timerDecreaseAmount);
+            }
 
             transform.localScale = newScale;
 

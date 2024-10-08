@@ -5,6 +5,8 @@ using UnityEngine;
 public class SausageDogManager : MinigameBase
 {
     [SerializeField] PlayerDog[] playerDogs;
+    FoodSpawner foodSpawner;
+    [SerializeField] float foodSpawnerDelay = 5f;
 
     void Awake()
     {
@@ -24,6 +26,7 @@ public class SausageDogManager : MinigameBase
     public void InitialiseGame()
     {
         Debug.Log("Initialising dog mini game");
+
 
         // Set player ID's
 
@@ -80,6 +83,8 @@ public class SausageDogManager : MinigameBase
     {
         //Do you want to do something when the minigame timer runs out?
         //This is where you do that!
+
+
     }
 
     protected override void OnResetGame()

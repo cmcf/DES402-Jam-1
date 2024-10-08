@@ -11,68 +11,93 @@ public class FoodSpawner : MonoBehaviour
     [SerializeField] int maxFood = 5; // Maximum amount of food on the screen at the same time
     [SerializeField] float minDistanceBetweenFood = 0.5f; // Minimum distance between food. Stops overlapping
 
+    public bool canSpawnFood = false;
+
     // Stores all spawned food items
     List<GameObject> spawnedFood = new List<GameObject>();
 
     void Start()
     {
-        StartCoroutine(SpawnObstacles());
+        StartCoroutine(SpawnFood());
     }
 
-    IEnumerator SpawnObstacles()
+    // Method to trigger when the game starts
+    public void OnGameStart()
     {
-        while (true)
+        // Enable food spawning when game has started
+        canSpawnFood = true;
+    }
+
+    IEnumerator SpawnFood()
+    {  
+        while (true) 
         {
-            // Spawns food after delay has passed
-            yield return new WaitForSeconds(spawnDelay);
-
-            // Check how many food items are in the radius
-            if (CountFoodInRadius() < maxFood)
+            // Only spawns if canSpawnFood is true
+            if (canSpawnFood)
             {
-                // Try to get a valid spawn position within the radius
-                Vector2 spawnPos;
-                bool validPositionFound = false;
-                int attempts = 0;
-                // Limits the number of attempts to find a non-overlapping position
-                int maxAttempts = 10; 
+                // Spawns food after delay has passed
+                yield return new WaitForSeconds(spawnDelay);
 
-                // Try finding a valid spawn position within the max number of attempts
-                while (!validPositionFound && attempts < maxAttempts)
+                // Check how many food items are in the radius
+                if (CountFoodInRadius() < maxFood)
                 {
-                    spawnPos = GetRandomPosition();
-                    if (!IsPositionOverlapping(spawnPos))
+                    Vector2 spawnPos;
+                    bool validPositionFound = false;
+                    int attempts = 0;
+                    int maxAttempts = 10;
+
+                    while (!validPositionFound && attempts < maxAttempts)
                     {
-                        // If the position is valid, spawn the food item
-                        GameObject newFoodPickup = Instantiate(foodPrefab, spawnPos, Quaternion.identity);
-                        // Adds spawned food into current list
-                        spawnedFood.Add(newFoodPickup);
-                        // Food flashes
-                        StartCoroutine(FlashFood(newFoodPickup));
-                        validPositionFound = true; 
+                        spawnPos = GetRandomPosition();
+                        if (!IsPositionOverlapping(spawnPos))
+                        {
+                            // If the position is valid, spawn the food item
+                            GameObject newFoodPickup = Instantiate(foodPrefab, spawnPos, Quaternion.identity);
+                            spawnedFood.Add(newFoodPickup);
+                            // Food flashes
+                            StartCoroutine(FlashFood(newFoodPickup));
+                            validPositionFound = true;
+                        }
+                        attempts++;
                     }
-                    attempts++;
                 }
+            }
+            else
+            {
+                yield return null;
             }
         }
     }
 
     IEnumerator FlashFood(GameObject food)
     {
+        // Ensure the food object and its SpriteRenderer exist
+        if (food == null) yield break;
+
         SpriteRenderer sr = food.GetComponent<SpriteRenderer>();
+        if (sr == null) yield break;
+
         float elapsedTime = 0f;
         while (elapsedTime < flashDuration)
         {
-            if (food.GetComponent<SpriteRenderer>() != null)
-            {
-                // Toggle visibility by enabling/disabling the sprite
-                sr.enabled = !sr.enabled;
-                // Flash every 0.2 seconds
-                yield return new WaitForSeconds(0.2f); 
-                elapsedTime += 0.2f;
-            }
+            // If the food has been destroyed, exit the coroutine
+            if (food == null) yield break;
+
+            // Toggle visibility by enabling/disabling the sprite
+            sr.enabled = !sr.enabled;
+
+            // Flash every 0.2 seconds
+            yield return new WaitForSeconds(0.2f);
+
+            // Increase elapsed time
+            elapsedTime += 0.2f;
         }
-        // Ensure the food is visible after flashing
-        sr.enabled = true;
+
+        // Ensure the food is visible after flashing 
+        if (food != null)
+        {
+            sr.enabled = true;
+        }
     }
 
     Vector2 GetRandomPosition()
