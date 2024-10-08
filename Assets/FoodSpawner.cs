@@ -35,9 +35,6 @@ public class FoodSpawner : MonoBehaviour
             // Only spawns if canSpawnFood is true
             if (canSpawnFood)
             {
-                // Log before waiting to check the flow
-                Debug.Log("Attempting to spawn food...");
-
                 // Check how many food items are in the radius
                 if (CountFoodInRadius() < maxFood)
                 {
@@ -57,9 +54,6 @@ public class FoodSpawner : MonoBehaviour
                             // Food flashes
                             StartCoroutine(FlashFood(newFoodPickup));
                             validPositionFound = true;
-
-                            // Log successful spawn
-                            Debug.Log("Food spawned at position: " + spawnPos);
                         }
                         attempts++;
                     }

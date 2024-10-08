@@ -95,7 +95,7 @@ public class PlayerDog : MonoBehaviour
         return angle;
     }
 
-    private void ClampScreen()
+    public void ClampScreen()
     {
         // Clamps the x-position
         Vector3 clampedXPosition = ScreenUtility.ClampToScreen(transform.position, screenID, xPadding);
