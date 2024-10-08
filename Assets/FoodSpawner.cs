@@ -5,7 +5,7 @@ using UnityEngine;
 public class FoodSpawner : MonoBehaviour
 {
     public GameObject foodPrefab;
-    [SerializeField] float spawnDelay = 5f; // Time between food spawns
+    [SerializeField] float delayUntilNextSpawn = 5f; // Time between food spawns
     [SerializeField] float flashDuration = 1.5f; // Duration of the flash
     [SerializeField] float spawnRadius = 5f; // Radius around the spawner where items can spawn
     [SerializeField] int maxFood = 5; // Maximum amount of food on the screen at the same time
@@ -29,14 +29,14 @@ public class FoodSpawner : MonoBehaviour
     }
 
     IEnumerator SpawnFood()
-    {  
-        while (true) 
+    {
+        while (true)
         {
             // Only spawns if canSpawnFood is true
             if (canSpawnFood)
             {
-                // Spawns food after delay has passed
-                yield return new WaitForSeconds(spawnDelay);
+                // Log before waiting to check the flow
+                Debug.Log("Attempting to spawn food...");
 
                 // Check how many food items are in the radius
                 if (CountFoodInRadius() < maxFood)
@@ -57,14 +57,20 @@ public class FoodSpawner : MonoBehaviour
                             // Food flashes
                             StartCoroutine(FlashFood(newFoodPickup));
                             validPositionFound = true;
+
+                            // Log successful spawn
+                            Debug.Log("Food spawned at position: " + spawnPos);
                         }
                         attempts++;
                     }
                 }
+
+                // Wait for the specified delay before attempting to spawn again
+                yield return new WaitForSeconds(delayUntilNextSpawn);
             }
             else
             {
-                yield return null;
+                yield return null; // Yield control until the next frame if spawning is disabled
             }
         }
     }
