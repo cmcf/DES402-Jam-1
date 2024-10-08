@@ -42,8 +42,10 @@ public class PlayerDog : MonoBehaviour
 
     void Update()
     {
-        // Player moves at a consistent speed
-        Vector2 moveDirection = inputDirection;
+        // Player moves automatically in the last direction input
+        Vector2 moveDirection = inputDirection != Vector2.zero ? inputDirection : lastMoveDirection;
+
+        // Update position based on the move direction
         transform.position += (Vector3)moveDirection * dogMoveSpeed * Time.deltaTime;
 
         // Rotate the player only if the move direction has changed
