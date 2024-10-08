@@ -6,7 +6,7 @@ public class SausageDogManager : MinigameBase
 {
     [SerializeField] PlayerDog[] playerDogs;
     FoodSpawner foodSpawner;
-    [SerializeField] float foodSpawnerDelay = 5f;
+    [SerializeField] float foodSpawnerStartDelay = 5f;
 
     void Awake()
     {
