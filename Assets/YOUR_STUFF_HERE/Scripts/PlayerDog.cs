@@ -42,20 +42,42 @@ public class PlayerDog : MonoBehaviour
 
     void Update()
     {
-        // Player moves automatically in the last direction input
-        Vector2 moveDirection = inputDirection != Vector2.zero ? inputDirection : lastMoveDirection;
+        Move();
+
+        MoveFoodSegments();
+
+        ClampScreen();
+    }
+
+    void Move()
+    {
+        Vector2 moveDirection;
+
+        // Set movement direction
+        if (inputDirection != Vector2.zero)
+        {
+            moveDirection = inputDirection;
+        }
+        else
+        {
+            moveDirection = lastMoveDirection;
+        }
 
         // Update position based on the move direction
         transform.position += (Vector3)moveDirection * dogMoveSpeed * Time.deltaTime;
 
-        // Rotate the player only if the move direction has changed
+        // Rotate or flip the player if move direction changes
         if (moveDirection != Vector2.zero && moveDirection != lastMoveDirection)
         {
-            transform.eulerAngles = new Vector3(0, 0, GetAngleFromVector(moveDirection));
+            ApplyRotationAndFlip(moveDirection);
+
             // Update last move direction
             lastMoveDirection = moveDirection;
         }
+    }
 
+    void MoveFoodSegments()
+    {
         // Move each segment to the position behind the previous segment with smooth following
         for (int i = 1; i < segments.Count; i++)
         {
@@ -67,34 +89,35 @@ public class PlayerDog : MonoBehaviour
             // Use Lerp to smoothly move towards the target position
             segments[i].position = Vector3.Lerp(segments[i].position, targetPosition, Time.deltaTime * foodFollowSpeed);
         }
-
-        ClampScreen();
     }
 
-    float GetAngleFromVector(Vector2 dir)
+    void ApplyRotationAndFlip(Vector2 dir)
     {
-        // Default rotation angle is 0 when player is facing up
-        float angle = 0;
-
-        // Determine the angle based on direction
-        if (dir.x > 0) // Moving right
+        // Determine the rotation based on direction the player is facing 
+        // If moving right, flip the sprite
+        if (dir.x > 0) 
         {
-            angle = -90;  // Rotate -90 degrees for right
+            transform.eulerAngles = new Vector3(0, 0, 0);
+            spriteRenderer.flipX = true;
         }
-        else if (dir.x < 0) // Moving left
+        // No changes to sprite is facing left
+        else if (dir.x < 0)
         {
-            angle = 90;  // Rotate 90 degrees for left
+            transform.eulerAngles = new Vector3(0, 0, 0);
+            spriteRenderer.flipX = false;
         }
-        else if (dir.y < 0) // Moving down
+        // Rotate 90 when facing down
+        else if (dir.y < 0) 
         {
-            angle = 180;  // Rotate 180 degrees for down
+            transform.eulerAngles = new Vector3(0, 0, 90);
+            spriteRenderer.flipX = false; 
         }
-        else if (dir.y > 0) // Moving up
+        // Rotate -90 when facing up
+        else if (dir.y > 0) 
         {
-            angle = 0;  // Keep 0 degrees for up
+            transform.eulerAngles = new Vector3(0, 0, -90); 
+            spriteRenderer.flipX = false; 
         }
-
-        return angle;
     }
 
     public void ClampScreen()
