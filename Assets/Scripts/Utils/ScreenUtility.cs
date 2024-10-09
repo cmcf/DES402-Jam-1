@@ -98,7 +98,7 @@ public static class ScreenUtility
         return onScreen;
     }
 
-    public static Vector2 ClampToScreen(Vector2 posToTest, int screenID, float buffer = 0.0f)
+    public static Vector2 ClampToScreen(Vector2 posToTest, int screenID, float buffer = 0.0f, float yPadding = 0)
     {
         float minY = -5.0f; float h = 10f;
         float minX = -10.0f; float w = 5.0f;

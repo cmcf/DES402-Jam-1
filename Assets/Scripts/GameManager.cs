@@ -151,7 +151,7 @@ public class GameManager : MonoBehaviour
         Cursor.visible = false;
     }
 
-    private void IncreaseTimer(float time){
+    public void IncreaseTimer(float time){
         m_GameTimer.AddTime(time);
     }
 
