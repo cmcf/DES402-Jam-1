@@ -5,7 +5,10 @@ using UnityEngine.UIElements;
 
 public class PlayerDog : MonoBehaviour
 {
-    public GameObject foodSegmentPrefab; // Prefab of the food segment to spawn
+    public GameObject foodSegmentPrefab;
+    public GameObject firstSegmentPrefab;
+    public GameObject lastSegmentPrefab;
+
     public List<Transform> segments = new List<Transform>(); // List of all player food segments
     List<Vector3> positions = new List<Vector3>(); // Positions for food segments to follow
     [SerializeField] float segmentSpacing = 0.5f; // Distance between each food segment
@@ -32,9 +35,12 @@ public class PlayerDog : MonoBehaviour
     float xPadding = 0.5f;
 
     void Start()
-    {
-        // Add the initial player object to the list of segments
+    { 
         segments.Add(transform);
+
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        minigameManager = FindObjectOfType<MinigameManager>();
+
 
         spriteRenderer = GetComponent<SpriteRenderer>();
         minigameManager = FindObjectOfType<MinigameManager>();
@@ -93,31 +99,35 @@ public class PlayerDog : MonoBehaviour
 
     void ApplyRotationAndFlip(Vector2 dir)
     {
-        // Determine the rotation based on direction the player is facing 
-        // If moving right, flip the sprite
-        if (dir.x > 0) 
+        // Determine the rotation based on the direction the player is facing 
+        if (dir.x > 0) // Moving right
         {
             transform.eulerAngles = new Vector3(0, 0, 0);
             spriteRenderer.flipX = true;
         }
-        // No changes to sprite is facing left
-        else if (dir.x < 0)
+        else if (dir.x < 0) // Moving left
         {
             transform.eulerAngles = new Vector3(0, 0, 0);
             spriteRenderer.flipX = false;
         }
-        // Rotate 90 when facing down
-        else if (dir.y < 0) 
+        else if (dir.y < 0) // Moving down
         {
             transform.eulerAngles = new Vector3(0, 0, 90);
-            spriteRenderer.flipX = false; 
+            spriteRenderer.flipX = false;
         }
-        // Rotate -90 when facing up
-        else if (dir.y > 0) 
+        else if (dir.y > 0) // Moving up
         {
-            transform.eulerAngles = new Vector3(0, 0, -90); 
-            spriteRenderer.flipX = false; 
+            transform.eulerAngles = new Vector3(0, 0, -90);
+            spriteRenderer.flipX = false;
         }
+
+        // Apply the same rotation to the last segment
+        if (segments.Count > 0)
+        {
+            // Rotate the last segment
+            segments[segments.Count - 1].eulerAngles = transform.eulerAngles;
+        }
+
     }
 
     public void ClampScreen()
@@ -149,20 +159,53 @@ public class PlayerDog : MonoBehaviour
 
     void AddSegment()
     {
-        // Get the last segment in the list
-        Transform lastSegment = segments[segments.Count - 1];
+        // If it's the first food collected, spawn the first segment with legs
+        if (segments.Count == 1)
+        {
+            // Position the first segment behind the player
+            Vector3 firstSegmentPosition = transform.position - transform.up * segmentSpacing;
 
-        // Calculate the position for the new segment behind the last segment
-        Vector3 newSegmentPosition = lastSegment.position - lastSegment.up * segmentSpacing;
+            // Instantiate the first segment
+            GameObject firstSegment = Instantiate(firstSegmentPrefab, firstSegmentPosition, Quaternion.identity);
 
-        // Instantiate a new segment at the calculated position
-        GameObject newSegment = Instantiate(foodSegmentPrefab, newSegmentPosition, Quaternion.identity);
+            // Add the first segment directly after the dogs head
+            segments.Add(firstSegment.transform);
+        }
+        else if (segments.Count == 2)
+        {
+            // Instantiate the last segment behind the first segment
+            Vector3 lastSegmentPosition = segments[0].position - segments[0].up * segmentSpacing;
 
-        // Add the new segment to the list
-        segments.Add(newSegment.transform);
+            // Instantiate the last segment
+            GameObject lastSegmentObj = Instantiate(lastSegmentPrefab, lastSegmentPosition, Quaternion.identity);
 
-        // Directly set the new segment to follow the last segment more closely
-        newSegment.transform.position = lastSegment.position - lastSegment.up * segmentSpacing;
+            // Add the last segment to the list
+            segments.Add(lastSegmentObj.transform);
+        }
+        else 
+        {
+            // Place the food segments between the first segment and the last segment
+            Transform secondLastSegment = segments[segments.Count - 2];
+
+            // Calculate the position for the new food segment
+            Vector3 newSegmentPosition = secondLastSegment.position - secondLastSegment.up * segmentSpacing;
+
+            // Instantiate a new food segment
+            GameObject newSegment = Instantiate(foodSegmentPrefab, newSegmentPosition, Quaternion.identity);
+
+            // Add the new segment before the last one
+            segments.Insert(segments.Count - 1, newSegment.transform);
+        }
+    }
+
+    void UpdateLastSegment()
+    {
+        if (segments.Count > 1)
+        {
+            // Set the last segment to the tail segment
+            Transform lastSegment = segments[segments.Count - 1];
+            lastSegment.GetComponent<SpriteRenderer>().sprite = lastSegmentPrefab.GetComponent<SpriteRenderer>().sprite;
+        }
     }
 
     void OnTriggerEnter2D(Collider2D collision)
@@ -194,10 +237,10 @@ public class PlayerDog : MonoBehaviour
                 // Remove the last segment
                 Transform lastSegment = segments[segments.Count - 1];
                 segments.RemoveAt(segments.Count - 1);
-                //Player score is reduced
-                playerScore-= 1;
- 
                 Destroy(lastSegment.gameObject);
+
+                // Update the new last segment to have the "tail" sprite
+                UpdateLastSegment();
 
             }
 
