@@ -7,12 +7,11 @@ using UnityEngine;
 public class ObstacleSpawner : MonoBehaviour
 {
 
-    // Reference to the obstacle prefab
+    [Header("References")]
     public GameObject obstaclePrefab;
-    // Spawn point for the obstacle
     public Transform spawnPoint;
 
-    // Obstacle move speed
+    [Header("Obstacle Settings")]
     [SerializeField] float obstacleSpeed = 4f;
     // Time interval between obstacle spawns
     [SerializeField] float spawnInterval = 10f;
@@ -20,8 +19,6 @@ public class ObstacleSpawner : MonoBehaviour
     [SerializeField] float obstacleLifeSpan = 20f;
 
     public bool canSpawnObstacle = false;
-
-    
 
     void Start()
     {
