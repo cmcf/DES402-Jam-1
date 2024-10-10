@@ -156,7 +156,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      8bitmeteor3v2_0: 2607697780717766116
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
