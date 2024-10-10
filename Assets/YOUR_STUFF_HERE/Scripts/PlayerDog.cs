@@ -34,6 +34,8 @@ public class PlayerDog : MonoBehaviour
     float yPadding = 0.1f;
     float xPadding = 0.5f;
 
+    public bool canFlip = false;
+
     void Start()
     { 
         segments.Add(transform);
@@ -102,32 +104,48 @@ public class PlayerDog : MonoBehaviour
         // Determine the rotation based on the direction the player is facing 
         if (dir.x > 0) // Moving right
         {
-            transform.eulerAngles = new Vector3(0, 0, 0);
-            spriteRenderer.flipX = true;
+            transform.eulerAngles = new Vector3(0, 0, 0); // No rotation for horizontal movement
+            spriteRenderer.flipX = true; // Flip the player sprite when facing right
         }
         else if (dir.x < 0) // Moving left
         {
-            transform.eulerAngles = new Vector3(0, 0, 0);
-            spriteRenderer.flipX = false;
+            transform.eulerAngles = new Vector3(0, 0, 0); // No rotation for horizontal movement
+            spriteRenderer.flipX = false; // Do not flip the sprite when facing left
         }
         else if (dir.y < 0) // Moving down
         {
-            transform.eulerAngles = new Vector3(0, 0, 90);
-            spriteRenderer.flipX = false;
+            transform.eulerAngles = new Vector3(0, 0, 90); // Rotate the player for downward movement
+            spriteRenderer.flipX = false; // Ensure it's not flipped
         }
         else if (dir.y > 0) // Moving up
         {
-            transform.eulerAngles = new Vector3(0, 0, -90);
-            spriteRenderer.flipX = false;
+            transform.eulerAngles = new Vector3(0, 0, -90); // Rotate the player for upward movement
+            spriteRenderer.flipX = false; // Ensure it's not flipped
+        }
+
+        // Flip the first segment
+        if (segments.Count > 1)
+        {
+            Transform firstSegment = segments[1];
+            SpriteRenderer firstSegmentRenderer = firstSegment.GetComponent<SpriteRenderer>();
+
+            // Check if the player is facing right and flip the first segment
+            if (dir.x > 0) 
+            {
+                firstSegmentRenderer.flipX = true; 
+            }
+            else if (dir.x < 0) 
+            {
+                firstSegmentRenderer.flipX = false; 
+            }
         }
 
         // Apply the same rotation to the last segment
-        if (segments.Count > 0)
+        if (segments.Count > 2)
         {
             // Rotate the last segment
             segments[segments.Count - 1].eulerAngles = transform.eulerAngles;
         }
-
     }
 
     public void ClampScreen()
