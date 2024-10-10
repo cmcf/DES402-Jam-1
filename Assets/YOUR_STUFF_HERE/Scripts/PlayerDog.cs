@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.UIElements;
 
 public class PlayerDog : MonoBehaviour
@@ -8,6 +9,7 @@ public class PlayerDog : MonoBehaviour
     SpriteRenderer spriteRenderer;
     GameTimer gameTimer;
     MinigameManager minigameManager;
+    AudioSource audioSource;
 
     [Header("Segment Prefabs")]
     public GameObject foodSegmentPrefab;
@@ -29,6 +31,10 @@ public class PlayerDog : MonoBehaviour
     [SerializeField] float timerIncreaseAmount = 0.5f;
     [SerializeField] float timerDecreaseAmount = 0.5f;
 
+    [Header("Player SFX")]
+    public AudioClip moveSFX;
+    public AudioClip hitSFX;
+
     public int screenID = -1;
 
     Vector2 inputDirection = Vector2.zero;
@@ -43,9 +49,7 @@ public class PlayerDog : MonoBehaviour
     {
         segments.Add(transform);
 
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        minigameManager = FindObjectOfType<MinigameManager>();
-
+        audioSource = FindObjectOfType<AudioSource>();
 
         spriteRenderer = GetComponent<SpriteRenderer>();
         minigameManager = FindObjectOfType<MinigameManager>();
@@ -84,6 +88,8 @@ public class PlayerDog : MonoBehaviour
 
             // Update last move direction
             lastMoveDirection = moveDirection;
+
+            audioSource.PlayOneShot(moveSFX);
         }
     }
 
@@ -312,6 +318,8 @@ public class PlayerDog : MonoBehaviour
         // Player loses food segments if collided with obstacles
         if (collision.CompareTag("Obstacle"))
         {
+            audioSource.PlayOneShot(hitSFX);
+
             // Checks if the last segment is food and remove it
             if (segments.Count > 1 && segments[segments.Count - 1].CompareTag("Food"))
             {
