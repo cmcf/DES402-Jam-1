@@ -5,30 +5,33 @@ using UnityEngine.UIElements;
 
 public class PlayerDog : MonoBehaviour
 {
-    public GameObject foodSegmentPrefab;
-    public GameObject firstSegmentPrefab;
-    public GameObject lastSegmentPrefab;
-
-    public List<Transform> segments = new List<Transform>(); // List of all player food segments
-    List<Vector3> positions = new List<Vector3>(); // Positions for food segments to follow
-    [SerializeField] float segmentSpacing = 0.5f; // Distance between each food segment
-
-    [SerializeField] float dogMoveSpeed = 2f;
-
-    [SerializeField] float timerIncreaseAmount = 0.5f;
-    [SerializeField] float timerDecreaseAmount = 0.5f;
-    public int screenID = -1;
-    Vector2 inputDirection = Vector2.zero;
-
-    public int playerScore = 0;
-
-    [SerializeField] float foodFollowSpeed = 6f;
-
     SpriteRenderer spriteRenderer;
     GameTimer gameTimer;
-
     MinigameManager minigameManager;
 
+    [Header("Segment Prefabs")]
+    public GameObject foodSegmentPrefab;
+    public GameObject frontLegSegment;
+    public GameObject backLegSegmentPrefab;
+    public GameObject tailSegment;
+
+    [Header("Segment List")]
+    public List<Transform> segments = new List<Transform>(); // List of all player food segments
+    List<Vector3> positions = new List<Vector3>(); // Positions for food segments to follow
+
+    [Header("Player Settings")]
+    [SerializeField] float segmentSpacing = 0.5f; // Distance between each food segment
+    [SerializeField] float dogMoveSpeed = 2f;
+    [SerializeField] float foodFollowSpeed = 6f;
+    public int playerScore = 0;
+
+    [Header("Timer Settings")]
+    [SerializeField] float timerIncreaseAmount = 0.5f;
+    [SerializeField] float timerDecreaseAmount = 0.5f;
+
+    public int screenID = -1;
+
+    Vector2 inputDirection = Vector2.zero;
     Vector2 lastMoveDirection;
 
     float yPadding = 0.1f;
@@ -37,7 +40,7 @@ public class PlayerDog : MonoBehaviour
     public bool canFlip = false;
 
     void Start()
-    { 
+    {
         segments.Add(transform);
 
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -102,49 +105,95 @@ public class PlayerDog : MonoBehaviour
     void ApplyRotationAndFlip(Vector2 dir)
     {
         // Determine the rotation based on the direction the player is facing 
-        if (dir.x > 0) // Moving right
+        if (dir.x > 0)
         {
-            transform.eulerAngles = new Vector3(0, 0, 0); // No rotation for horizontal movement
-            spriteRenderer.flipX = true; // Flip the player sprite when facing right
+            // Flip the player sprite when facing right
+            transform.eulerAngles = new Vector3(0, 0, 0);
+            spriteRenderer.flipX = true;
         }
-        else if (dir.x < 0) // Moving left
+        else if (dir.x < 0)
         {
-            transform.eulerAngles = new Vector3(0, 0, 0); // No rotation for horizontal movement
-            spriteRenderer.flipX = false; // Do not flip the sprite when facing left
+            // No rotation for horizontal movement
+            transform.eulerAngles = new Vector3(0, 0, 0);
+            spriteRenderer.flipX = false;
         }
-        else if (dir.y < 0) // Moving down
+        else if (dir.y < 0)
         {
-            transform.eulerAngles = new Vector3(0, 0, 90); // Rotate the player for downward movement
-            spriteRenderer.flipX = false; // Ensure it's not flipped
+            // Rotate the player for downward movement
+            transform.eulerAngles = new Vector3(0, 0, 90);
+            spriteRenderer.flipX = false;
         }
-        else if (dir.y > 0) // Moving up
+        else if (dir.y > 0)
         {
-            transform.eulerAngles = new Vector3(0, 0, -90); // Rotate the player for upward movement
-            spriteRenderer.flipX = false; // Ensure it's not flipped
+            // Rotate the player for upward movement
+            transform.eulerAngles = new Vector3(0, 0, -90);
+            spriteRenderer.flipX = false;
         }
+        // Flip segments based on players direction
 
+        FlipSegments(dir);
+    }
+
+    void FlipSegments(Vector2 dir)
+    {
         // Flip the first segment
         if (segments.Count > 1)
         {
             Transform firstSegment = segments[1];
             SpriteRenderer firstSegmentRenderer = firstSegment.GetComponent<SpriteRenderer>();
 
-            // Check if the player is facing right and flip the first segment
-            if (dir.x > 0) 
+            if (dir.x > 0)
             {
-                firstSegmentRenderer.flipX = true; 
+                firstSegmentRenderer.flipX = true;
             }
-            else if (dir.x < 0) 
+            else if (dir.x < 0)
             {
-                firstSegmentRenderer.flipX = false; 
+                firstSegmentRenderer.flipX = false;
+            }
+        }
+
+        // Flip the back legs segment
+        if (segments.Count > 2)
+        {
+            Transform backLegSegment = segments[2];
+            SpriteRenderer backLegSegmentRenderer = backLegSegment.GetComponent<SpriteRenderer>();
+
+            if (dir.x > 0)
+            {
+                backLegSegmentRenderer.flipX = true;
+            }
+            else if (dir.x < 0)
+            {
+                backLegSegmentRenderer.flipX = false;
             }
         }
 
         // Apply the same rotation to the last segment
-        if (segments.Count > 2)
+        if (segments.Count > 3)
         {
-            // Rotate the last segment
-            segments[segments.Count - 1].eulerAngles = transform.eulerAngles;
+            Transform lastSegment = segments[segments.Count - 1]; // Last segment
+            SpriteRenderer lastSegmentRenderer = lastSegment.GetComponent<SpriteRenderer>();
+
+            if (dir.x > 0)
+            {
+                lastSegmentRenderer.flipX = true;
+                lastSegment.eulerAngles = new Vector3(0, 0, 0);
+            }
+            else if (dir.x < 0)
+            {
+                lastSegmentRenderer.flipX = false;
+                lastSegment.eulerAngles = new Vector3(0, 0, 0);
+            }
+            else if (dir.y < 0)
+            {
+                lastSegment.eulerAngles = new Vector3(0, 0, 90);
+                lastSegmentRenderer.flipX = false;
+            }
+            else if (dir.y > 0)
+            {
+                lastSegment.eulerAngles = new Vector3(0, 0, -90);
+                lastSegmentRenderer.flipX = false;
+            }
         }
     }
 
@@ -177,44 +226,57 @@ public class PlayerDog : MonoBehaviour
 
     void AddSegment()
     {
-        // If it's the first food collected, spawn the first segment with legs
+        // If it's the first food collected, spawn the first segment with front legs
         if (segments.Count == 1)
         {
             // Position the first segment behind the player
             Vector3 firstSegmentPosition = transform.position - transform.up * segmentSpacing;
 
             // Instantiate the first segment
-            GameObject firstSegment = Instantiate(firstSegmentPrefab, firstSegmentPosition, Quaternion.identity);
+            GameObject firstSegment = Instantiate(frontLegSegment, firstSegmentPosition, Quaternion.identity);
 
-            // Add the first segment directly after the dogs head
+            // Add the first segment directly after the dog's head
             segments.Add(firstSegment.transform);
         }
         else if (segments.Count == 2)
         {
-            // Instantiate the last segment behind the first segment
-            Vector3 lastSegmentPosition = segments[0].position - segments[0].up * segmentSpacing;
+            // Instantiate the back leg segment behind the front legs
+            Vector3 backLegPosition = segments[1].position - segments[1].up * segmentSpacing;
 
-            // Instantiate the last segment
-            GameObject lastSegmentObj = Instantiate(lastSegmentPrefab, lastSegmentPosition, Quaternion.identity);
+            // Instantiate the back leg segment
+            GameObject backLegSegment = Instantiate(backLegSegmentPrefab, backLegPosition, Quaternion.identity);
 
-            // Add the last segment to the list
-            segments.Add(lastSegmentObj.transform);
+            // Add the back leg segment to the list
+            segments.Add(backLegSegment.transform);
         }
-        else 
+        else if (segments.Count == 3)
         {
-            // Place the food segments between the first segment and the last segment
-            Transform secondLastSegment = segments[segments.Count - 2];
+            // Instantiate the tail segment behind the back legs
+            Vector3 tailSegmentPosition = segments[2].position - segments[2].up * segmentSpacing;
 
-            // Calculate the position for the new food segment
-            Vector3 newSegmentPosition = secondLastSegment.position - secondLastSegment.up * segmentSpacing;
+            // Instantiate the tail segment
+            GameObject tailSegmentObj = Instantiate(tailSegment, tailSegmentPosition, Quaternion.identity);
+
+            // Add the tail segment to the list
+            segments.Add(tailSegmentObj.transform);
+        }
+        else
+        {
+            // Place the food segment between the front legs and the back legs
+            Transform frontLegSegment = segments[1];
+            Transform backLegSegment = segments[2];
+
+            // Calculates the position for the food segment between the front and back legs
+            Vector3 foodSegmentPosition = (frontLegSegment.position + backLegSegment.position) / 2;
 
             // Instantiate a new food segment
-            GameObject newSegment = Instantiate(foodSegmentPrefab, newSegmentPosition, Quaternion.identity);
+            GameObject foodSegment = Instantiate(foodSegmentPrefab, foodSegmentPosition, Quaternion.identity);
 
-            // Add the new segment before the last one
-            segments.Insert(segments.Count - 1, newSegment.transform);
+            // Add the new food segment in between the front legs and the back legs
+            segments.Insert(2, foodSegment.transform);
         }
     }
+
 
     void UpdateLastSegment()
     {
@@ -222,7 +284,7 @@ public class PlayerDog : MonoBehaviour
         {
             // Set the last segment to the tail segment
             Transform lastSegment = segments[segments.Count - 1];
-            lastSegment.GetComponent<SpriteRenderer>().sprite = lastSegmentPrefab.GetComponent<SpriteRenderer>().sprite;
+            lastSegment.GetComponent<SpriteRenderer>().sprite = tailSegment.GetComponent<SpriteRenderer>().sprite;
         }
     }
 
@@ -247,19 +309,25 @@ public class PlayerDog : MonoBehaviour
             Destroy(collision.gameObject);
         }
 
-        // Food segmenet is removed from player if they collide with an obstacle
+        // Player loses food segments if collided with obstacles
         if (collision.CompareTag("Obstacle"))
         {
-            if (segments.Count > 1) // Ensure there's at least one segment to remove
+            // Checks if the last segment is food and remove it
+            if (segments.Count > 1 && segments[segments.Count - 1].CompareTag("Food"))
             {
-                // Remove the last segment
-                Transform lastSegment = segments[segments.Count - 1];
+                Transform lastFoodSegment = segments[segments.Count - 1];
                 segments.RemoveAt(segments.Count - 1);
-                Destroy(lastSegment.gameObject);
+                Destroy(lastFoodSegment.gameObject);
+            }
+            else if (segments.Count > 3)
+            {
+                // Remove the third-to-last segment
+                Transform segmentToRemove = segments[segments.Count - 3];
+                segments.RemoveAt(segments.Count - 3);
+                Destroy(segmentToRemove.gameObject);
 
-                // Update the new last segment to have the "tail" sprite
+                // Update the new last segment
                 UpdateLastSegment();
-
             }
 
             if (minigameManager != null)
@@ -267,8 +335,8 @@ public class PlayerDog : MonoBehaviour
                 // Decrease game timer
                 minigameManager.GetTimer().AddTime(-timerDecreaseAmount);
             }
-
-            Destroy(collision.gameObject);
+            // Destroy the obstacle
+            Destroy(collision.gameObject); 
         }
     }
 }
