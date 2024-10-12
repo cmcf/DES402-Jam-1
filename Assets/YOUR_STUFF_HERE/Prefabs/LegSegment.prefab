@@ -10,10 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 2830228493710633986}
   - component: {fileID: 6460014852263438883}
-  - component: {fileID: 3378590630234367649}
   m_Layer: 0
   m_Name: LegSegment
-  m_TagString: Untagged
+  m_TagString: FrontLeg
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -87,16 +86,3 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &3378590630234367649
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6340441170276913964}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b2c4f57754cc5fe4c8f456eac9f3e82e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerScript: {fileID: 0}
