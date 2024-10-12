@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 2830228493710633986}
   - component: {fileID: 6460014852263438883}
   m_Layer: 0
-  m_Name: LegSegment
-  m_TagString: FrontLeg
+  m_Name: BackLeg
+  m_TagString: BackLeg
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -232,19 +232,22 @@ public class PlayerDog : MonoBehaviour
 
     void AddSegment()
     {
-        // If it's the first food collected, spawn the first segment with front legs
-        if (segments.Count == 1)
+        // Check if front legs are missing and re-add them first if necessary
+        if (!segments.Exists(segment => segment.CompareTag("FrontLeg")))
         {
-            // Position the first segment behind the player
+            // Position the front leg segment behind the player
             Vector3 firstSegmentPosition = transform.position - transform.up * segmentSpacing;
 
-            // Instantiate the first segment
+            // Instantiate the front leg segment
             GameObject firstSegment = Instantiate(frontLegSegment, firstSegmentPosition, Quaternion.identity);
 
-            // Add the first segment directly after the dog's head
+            // Add the front leg segment directly after the dog's head
             segments.Add(firstSegment.transform);
+            return; // Return after adding front legs to ensure correct order
         }
-        else if (segments.Count == 2)
+
+        // Check if back legs are missing and re-add them before adding more food
+        if (!segments.Exists(segment => segment.CompareTag("BackLeg")))
         {
             // Instantiate the back leg segment behind the front legs
             Vector3 backLegPosition = segments[1].position - segments[1].up * segmentSpacing;
@@ -254,25 +257,31 @@ public class PlayerDog : MonoBehaviour
 
             // Add the back leg segment to the list
             segments.Add(backLegSegment.transform);
+            return; // Return after adding back legs
         }
-        else if (segments.Count == 3)
+
+        // Check if tail is missing and re-add it before adding more food
+        if (!segments.Exists(segment => segment.CompareTag("Tail")))
         {
             // Instantiate the tail segment behind the back legs
-            Vector3 tailSegmentPosition = segments[2].position - segments[2].up * segmentSpacing;
+            Vector3 tailSegmentPosition = segments[segments.Count - 1].position - segments[segments.Count - 1].up * segmentSpacing;
 
             // Instantiate the tail segment
             GameObject tailSegmentObj = Instantiate(tailSegment, tailSegmentPosition, Quaternion.identity);
 
             // Add the tail segment to the list
             segments.Add(tailSegmentObj.transform);
+            return; // Return after adding tail
         }
-        else
+
+        // If all legs and tail are present, add food segment
+        if (segments.Count > 3)
         {
             // Place the food segment between the front legs and the back legs
             Transform frontLegSegment = segments[1];
             Transform backLegSegment = segments[2];
 
-            // Calculates the position for the food segment between the front and back legs
+            // Calculate the position for the food segment between the front and back legs
             Vector3 foodSegmentPosition = (frontLegSegment.position + backLegSegment.position) / 2;
 
             // Instantiate a new food segment
@@ -321,7 +330,7 @@ public class PlayerDog : MonoBehaviour
             audioSource.PlayOneShot(hitSFX);
 
             // Checks if the last segment is food and remove it
-            if (segments.Count > 1 && segments[segments.Count - 1].CompareTag("Food"))
+            if (segments.Count > 3 && segments[2].CompareTag("FoodSeg"))
             {
                 Transform lastFoodSegment = segments[segments.Count - 1];
                 segments.RemoveAt(segments.Count - 1);

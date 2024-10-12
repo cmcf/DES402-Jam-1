@@ -20,6 +20,11 @@ TagManager:
   - MinigameManager
   - Food
   - Obstacle
+  - Leg
+  - Tail
+  - FoodSeg
+  - BackLeg
+  - FrontLeg
   layers:
   - Default
   - TransparentFX
