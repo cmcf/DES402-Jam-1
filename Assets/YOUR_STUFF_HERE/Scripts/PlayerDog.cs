@@ -158,10 +158,20 @@ public class PlayerDog : MonoBehaviour
             }
         }
 
-        // Flip the back legs segment
-        if (segments.Count > 2)
+        // Find the back leg segment by tag
+        Transform backLegSegment = null;
+
+        foreach (Transform segment in segments)
         {
-            Transform backLegSegment = segments[2];
+            if (segment.CompareTag("BackLeg"))
+            {
+                backLegSegment = segment;
+                break;  // Exit the loop once the segment is found
+            }
+        }
+
+        if (backLegSegment != null)
+        {
             SpriteRenderer backLegSegmentRenderer = backLegSegment.GetComponent<SpriteRenderer>();
 
             if (dir.x > 0)
